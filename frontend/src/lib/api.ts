@@ -23,7 +23,23 @@ async function http<T>(path: string, init?: RequestInit): Promise<T> {
   })
   if (!res.ok) {
     const text = await res.text().catch(() => '')
-    throw new Error(text || `Request failed: ${res.status}`)
+    try {
+      // Try to parse the error as JSON to provide a better error message
+      const errorData = JSON.parse(text)
+      // Extract Prisma error message if available
+      if (errorData.error && errorData.error.includes('Invalid `prisma')) {
+        const match = errorData.error.match(/Column: \(([^)]+)\)/)
+        const fieldName = match ? match[1] : 'unknown field'
+        throw new Error(`Database error: Value too long for ${fieldName}`)
+      }
+      throw new Error(errorData.message || errorData.error || `Request failed: ${res.status}`)
+    } catch (e) {
+      // If parsing fails, use the raw text or a generic error message
+      if (e instanceof Error && e.message.includes('Database error:')) {
+        throw e
+      }
+      throw new Error(text || `Request failed: ${res.status}`)
+    }
   }
   return res.json()
 }

@@ -108,11 +108,18 @@ app.put('/products/:id', async (req, res) => {
 });
 app.delete('/products/:id', async (req, res) => {
     const { id } = req.params;
+    const productId = Number(id);
     try {
-        await prisma.product.delete({ where: { id: Number(id) } });
+        // Remove join rows first to satisfy FK constraints
+        await prisma.productCategory.deleteMany({ where: { productId } });
+        await prisma.product.delete({ where: { id: productId } });
         res.json({ message: 'Product deleted' });
     }
     catch (error) {
+        // If record does not exist, return 404
+        if (error?.code === 'P2025') {
+            return res.status(404).json({ error: 'Product not found' });
+        }
         res.status(400).json({ error: error.message });
     }
 });
@@ -150,11 +157,17 @@ app.put('/categories/:id', async (req, res) => {
 });
 app.delete('/categories/:id', async (req, res) => {
     const { id } = req.params;
+    const categoryId = Number(id);
     try {
-        await prisma.category.delete({ where: { id: Number(id) } });
+        // Remove join rows first to satisfy FK constraints
+        await prisma.productCategory.deleteMany({ where: { categoryId } });
+        await prisma.category.delete({ where: { id: categoryId } });
         res.json({ message: 'Category deleted' });
     }
     catch (error) {
+        if (error?.code === 'P2025') {
+            return res.status(404).json({ error: 'Category not found' });
+        }
         res.status(400).json({ error: error.message });
     }
 });

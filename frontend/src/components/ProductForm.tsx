@@ -47,11 +47,24 @@ export default function ProductForm({ categories, initial, onSubmit, onCancel }:
 
   function validate(v: ProductFormValues) {
     const e: Record<string, string> = {}
+    // Name validation
     if (!v.name || v.name.trim().length === 0) e.name = 'Name is required'
+    else if (v.name.length > 100) e.name = 'Name must be less than 100 characters'
+    
+    // Price validation
     const priceNum = Number(v.price)
     if (isNaN(priceNum) || priceNum <= 0) e.price = 'Price must be a positive number'
+    
+    // Stock validation
     const stockNum = Number(v.stockQuantity)
     if (!Number.isInteger(stockNum) || stockNum < 0) e.stockQuantity = 'Stock must be a non-negative integer'
+    
+    // Description validation
+    if (v.description && v.description.length > 500) e.description = 'Description must be less than 500 characters'
+    
+    // Image URL validation
+    if (v.imageUrl && v.imageUrl.length > 34255) e.imageUrl = 'Image URL must be less than 255 characters'
+    
     return e
   }
 
@@ -80,7 +93,12 @@ export default function ProductForm({ categories, initial, onSubmit, onCancel }:
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div className="sm:col-span-2">
           <label className="mb-1 block text-sm font-medium">Name</label>
-          <Input value={values.name} onChange={(e) => setValues({ ...values, name: e.target.value })} />
+          <Input 
+            value={values.name} 
+            onChange={(e) => setValues({ ...values, name: e.target.value })} 
+            maxLength={100} 
+          />
+          <div className="mt-1 text-xs text-gray-500">Max 100 characters</div>
           {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name}</p>}
         </div>
         <div>
@@ -95,12 +113,30 @@ export default function ProductForm({ categories, initial, onSubmit, onCancel }:
         </div>
         <div className="sm:col-span-2">
           <label className="mb-1 block text-sm font-medium">Image URL</label>
-          <Input value={values.imageUrl} onChange={(e) => setValues({ ...values, imageUrl: e.target.value })} />
+          <Input 
+            value={values.imageUrl} 
+            onChange={(e) => setValues({ ...values, imageUrl: e.target.value })} 
+            maxLength={255}
+          />
+          <div className="mt-1 text-xs text-gray-500">Max 255 characters</div>
+          {errors.imageUrl && <p className="mt-1 text-xs text-red-600">{errors.imageUrl}</p>}
         </div>
       </div>
       <div>
         <label className="mb-1 block text-sm font-medium">Description</label>
-        <textarea className="input min-h-28" value={values.description} onChange={(e) => setValues({ ...values, description: e.target.value })} />
+        <textarea 
+          className="input min-h-28" 
+          value={values.description} 
+          onChange={(e) => setValues({ ...values, description: e.target.value })} 
+          maxLength={500} 
+        />
+        <div className="mt-1 flex justify-between">
+          <p className="text-xs text-gray-500">Max 500 characters</p>
+          <p className="text-xs text-gray-500">
+            {(values.description?.length || 0)}/500
+          </p>
+        </div>
+        {errors.description && <p className="mt-1 text-xs text-red-600">{errors.description}</p>}
       </div>
       <div>
         <label className="mb-2 block text-sm font-medium">Categories</label>

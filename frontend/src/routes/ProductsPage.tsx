@@ -87,18 +87,28 @@ export default function ProductsPage() {
   }
 
   async function handleSubmit(values: ProductFormValues) {
-    const payload = {
-      name: values.name,
-      description: values.description,
-      price: Number(values.price),
-      stockQuantity: Number(values.stockQuantity),
-      imageUrl: values.imageUrl,
-      categoryIds: values.categoryIds,
+    try {
+      const payload = {
+        name: values.name,
+        description: values.description,
+        price: Number(values.price),
+        stockQuantity: Number(values.stockQuantity),
+        imageUrl: values.imageUrl,
+        categoryIds: values.categoryIds,
+      }
+      
+      if (editing) await api.updateProduct(editing.id, payload)
+      else await api.createProduct(payload)
+      
+      setModalOpen(false)
+      await fetchProducts()
+    } catch (error: any) {
+      // Display the error to the user
+      setError(error.message || 'An error occurred while saving the product')
+      // Don't close the modal so the user can fix the issue
+      return false
     }
-    if (editing) await api.updateProduct(editing.id, payload)
-    else await api.createProduct(payload)
-    setModalOpen(false)
-    await fetchProducts()
+    return true
   }
 
   async function handleDelete(id: number) {
