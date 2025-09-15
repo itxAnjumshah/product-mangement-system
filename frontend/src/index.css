@@ -1,0 +1,24 @@
+/* Tailwind base layers */
+@import "./App.css";
+@import "tailwindcss";
+
+/* Component shortcuts */
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-1 rounded-lg bg-brand-600 px-3 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-brand-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-1 rounded-lg border border-black/10 bg-white px-3 py-2 text-sm font-medium text-gray-900 shadow-sm transition hover:bg-gray-50 dark:border-white/10 dark:bg-gray-900 dark:text-white dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .input {
+    @apply block w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm outline-none ring-0 placeholder:text-gray-400 focus:border-brand-500 focus:ring-1 focus:ring-brand-500 dark:border-white/10 dark:bg-gray-900 dark:text-white;
+  }
+  .card {
+    @apply rounded-2xl border border-black/10 bg-white shadow-card dark:border-white/10 dark:bg-gray-900;
+  }
+}
+
+/* Global background tweak */
+html, body, #root {
+  min-height: 100%;
+}
